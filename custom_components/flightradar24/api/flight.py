@@ -22,7 +22,7 @@ class FlightType(Enum):
 
 
 class FlightProcessor:
-    __slots__ = ('_in_area', '_tracked', '_most_tracked', '_entered', '_exited', '_min_altitude', '_max_altitude',
+    __slots__ = ('_in_area', '_tracked', '_most_tracked', '_entered', '_exited', '_passed', '_min_altitude', '_max_altitude',
                  '_point', '_client', '_bounds', '_event_manager')
 
     def __init__(
