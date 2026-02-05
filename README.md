@@ -3,22 +3,25 @@
 [![HACS](https://img.shields.io/badge/HACS-Default-orange.svg?logo=HomeAssistantCommunityStore&logoColor=white)](https://github.com/hacs/integration)
 [![Community Forum](https://img.shields.io/static/v1.svg?label=Community&message=Forum&color=41bdf5&logo=HomeAssistant&logoColor=white)](https://community.home-assistant.io/t/custom-component-flightradar24)
 
-Flightradar24 integration allows one to track overhead flights in a given region or particular planes. It will also fire Home Assistant events when flights enter/exit/pass/landed/took off.
+Flightradar24 integration allows one to track overhead flights in a given region or particular planes. It will also fire Home Assistant events when flights enter/exit/pass/landed/took off. Or monitor departures and arrivals at an airport
 
 <b>IMPORTANT: No need FlightRadar24 subscription!</b>
 
 It allows you:
 1. Know how many flights in your area right now, or just have entered, exited it or passed the point of closest approach to its center. And get list of flights with [full information](#flight) by every relevant flight for the sensor 
 2. Track a particular plane or planes no matter where it currently is, even if it is a scheduled flight
-3. Get [top 10 most tracked flights on FlightRadar24](#most-tracked) 
-4. Create notifications (example - [Get a notification when a flight enters, exits or passes through your area](#notification-enters), [Get a notification when a tracked scheduled flight takes off](#notification-scheduled))
-5. Create automations (example - [Automatically track a flight by your needs](#automation))
-6. Add flights table to your [Home Assistant dashboard](https://www.home-assistant.io/dashboards/) by [Lovelace Card](#lovelace))
-7. Track your flight as [Device Tracker](#device-tracker) 
-8. Get info for last flights which were in your area or get info about latest exited flight by creating [Last Flights History Sensor](#last-flights) 
+3. Monitor daily statistics (like on time/delayed/canceled flights) of the selected airport
+4. Get [top 10 most tracked flights on FlightRadar24](#most-tracked) 
+5. Create notifications (example - [Get a notification when a flight enters, exits or passes through your area](#notification-enters), [Get a notification when a tracked scheduled flight takes off](#notification-scheduled))
+6. Create automations (example - [Automatically track a flight by your needs](#automation))
+7. Add flights table for your area to your [Home Assistant dashboard](https://www.home-assistant.io/dashboards/) by [Lovelace Card](#lovelace))
+8. Add departures/arrivals boards of the selected airport to your [Home Assistant dashboard](https://www.home-assistant.io/dashboards/) by [Lovelace Airport Card](#lovelace-airport))
+9. Track your flight as [Device Tracker](#device-tracker) 
+10. Get info for last flights which were in your area or get info about latest exited flight by creating [Last Flights History Sensor](#last-flights) 
 
-<img src="https://raw.githubusercontent.com/AlexandrErohin/home-assistant-flightradar24/master/docs/media/map.png" width="48%"><img src="https://raw.githubusercontent.com/AlexandrErohin/home-assistant-flightradar24/master/docs/media/sensors.png" width="48%">
-<p align="center"><img src="https://raw.githubusercontent.com/AlexandrErohin/home-assistant-flightradar24/master/docs/media/lovelace.png" width="50%"></p>
+<img src="https://raw.githubusercontent.com/AlexandrErohin/home-assistant-flightradar24/master/docs/media/map.png" width="48%"><img src="https://raw.githubusercontent.com/AlexandrErohin/home-assistant-flightradar24/master/docs/media/lovelace.png" width="48%">
+<img src="https://raw.githubusercontent.com/AlexandrErohin/home-assistant-flightradar24/master/docs/media/sensors1.png" width="48%"><img src="https://raw.githubusercontent.com/AlexandrErohin/home-assistant-flightradar24/master/docs/media/sensors2.png" width="48%">
+<img src="https://raw.githubusercontent.com/AlexandrErohin/home-assistant-flightradar24/master/docs/media/airport_departures.jpg" width="48%"><img src="https://raw.githubusercontent.com/AlexandrErohin/home-assistant-flightradar24/master/docs/media/airport_arrivals.jpg" width="48%">
 
 ## Components
 ### Events
@@ -32,12 +35,20 @@ It allows you:
  - flightradar24_tracked_took_off: Fired when a tracked flight takes off.
 
 ### Sensors
- - Current in area
- - Entered area
- - Exited area
- - Passed area
- - Additional tracked
- - Most tracked flights (You may disable it via configuration)
+ - Current in area - Current flights in your area
+ - Entered area - Flights that just have exited your area
+ - Exited area - Flights that just have entered your area
+ - Passed area - Flights that just passed the point of closest approach to your area's center
+ - Additional tracked - Your additional tracked outside your area
+ - Most tracked - Most tracked flights on FlightRadar24. You may disable it via configuration
+ - Airport arrivals - List of current arrival flights for the selected airport
+ - Airport departures - List of current departure flights for the selected airport
+ - Airport arrivals on time - Amount of arrivals on time for the selected airport today
+ - Airport arrivals delayed - Amount of delayed arrivals for the selected airport today
+ - Airport arrivals canceled - Amount of canceled arrivals for the selected airport today
+ - Airport departures on time - Amount of departures on time for the selected airport today
+ - Airport departures delayed - Amount of delayed departures for the selected airport today
+ - Airport departures canceled - Amount of canceled departures for the selected airport today
 
 ### <a id="device-tracker">Device Tracker</a>
 You may be interested to add a live flight as device_tracker with the flight information to a person in HA.
@@ -47,14 +58,17 @@ this device_tracker updates when there is a live flight in the additional tracke
 It works ONLY with one live flight from the additional tracked list at a time!
 
 ### Configuration
- - Add to track
- - Remove from track
+ - Add to track - Pass flight number or call sign or aircraft registration number to track flight outside your area. It adds flight to Additional tracked sensor
+ - Remove from track - Pass flight number or call sign or aircraft registration number to remove a flight from Additional tracked sensor
+ - Airport track - Pass IATA or ICAO airport code to start receiving data in Airport sensors. To stop receiving airport data just pass an empty string
  - API data fetching - you may disable FlightRadar API calls when not needed to prevent unnecessary API calls and save bandwidth and server load.
  - Clear Additional tracked - Clear all flights in Additional tracked sensor
 
-Sensors shows how many flights in the given area, additional tracked, just have entered, exited or passed through it. All sensors have attribute `flights` with list of [flight object](#flight) contained a full information by every relevant flight for the sensor
+Sensors (Current in area, Entered area, Exited area, Passed area, Additional tracked) shows how many flights in the given area, additional tracked, just have entered, exited or passed it. All these sensors have attribute `flights` with list of [flight object](#flight) contained a full information by every relevant flight for the sensor
 
-Configuration inputs fields allows to add or remove a flight to/from sensor - Additional tracked. Adding/Removing supports flight number, call sign, aircraft registration number
+Sensor Most tracked has attribute `flights` with list of [most tracked object](#most-tracked)
+
+Sensors Airport arrivals and Airport departures have attribute `flights` with list of the next 50 [airport flights](#airport-flight)
 
 ## Installation
 
@@ -242,7 +256,7 @@ cards:
       type: markdown
       content: >-
         {% set data = state_attr('sensor.flightradar24_current_in_area',
-        'flights') %} {% for flight in data %}{% if (flight.tracked_type | default('live')) == 'live' %}
+        'flights') | default([], true) %} {% for flight in data %}{% if (flight.tracked_type | default('live')) == 'live' %}
           <ha-icon icon="mdi:airplane"></ha-icon>{{ flight.flight_number }} - {{ flight.airline_short }} - {{ flight.aircraft_model }}
           {{ flight.airport_origin_city }}{%if flight.airport_origin_city %}<img src="https://flagsapi.com/{{ flight.airport_origin_country_code }}/shiny/16.png" title='{{ flight.airport_origin_country_name }}'/>{% endif %} -> {{ flight.airport_destination_city }}{%
           if flight.airport_destination_country_code %}<img src="https://flagsapi.com/{{ flight.airport_destination_country_code }}/shiny/16.png" title='{{ flight.airport_destination_country_name }}'/>{% endif %}
@@ -258,16 +272,13 @@ This example for `sensor.flightradar24_current_in_area` which shows flights in y
 All available fields for flight you can check [here](#flight)
 
 ### Lovelace Card with Map
-<p align="center"><img src="https://raw.githubusercontent.com/AlexandrErohin/home-assistant-flightradar24/master/docs/media/map.png" width="55%"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/AlexandrErohin/home-assistant-flightradar24/master/docs/media/map2.png" width="55%"></p>
 
-1. Open in a browser https://www.flightradar24.com
-2. Move the map so that your area is in the middle of the screen. And scroll to select comfortable map zoom
-3. Now you have URL of the map like https://www.flightradar24.com/50.03,8.49/12 Remember this URL
-4. Go to your [Home Assistant dashboard](https://www.home-assistant.io/dashboards/)
-5. In the top right corner, select the three-dot menu, then select Edit dashboard 
-6. Click on `+ ADD CARD`, search for `Manual`, click on `Manual`. 
-7. Add following code to the input window. Replace LATITUDE, LONGITUDE and ZOOM from URL from step 3. (Example - https://www.flightradar24.com/50.03,8.49/12 - LATITUDE is 50.03, LONGITUDE is 8.49, ZOOM is 12)
-8. Click `SAVE`
+1. Go to your [Home Assistant dashboard](https://www.home-assistant.io/dashboards/)
+2. In the top right corner, select the three-dot menu, then select Edit dashboard 
+3. Click on `+ ADD CARD`, search for `Manual`, click on `Manual`. 
+4. Add following code to the input window. Replace LATITUDE, LONGITUDE with your coordinates. URL example: https://globe.adsb.fi/?enableLabels&trackLabels&zoom=12&hideSideBar&lat=50.984944839678334&lon=11.311357147743463
+5. Click `SAVE`
 
 ```markdown
 type: vertical-stack
@@ -286,7 +297,7 @@ cards:
       type: markdown
       content: >-
         {% set data = state_attr('sensor.flightradar24_current_in_area',
-        'flights') %} {% for flight in data %}
+        'flights') | default([], true) %} {% for flight in data %}
           <ha-icon icon="mdi:airplane"></ha-icon>{{ flight.flight_number }}({{ flight.aircraft_registration }}) - {{ flight.airline_short }} - {{ flight.aircraft_model }}
           {{ flight.airport_origin_city }}{%if flight.airport_origin_city %}<img src="https://flagsapi.com/{{ flight.airport_origin_country_code }}/shiny/16.png" title='{{ flight.airport_origin_country_name }}'/>{% endif %} -> {{ flight.airport_destination_city }}{%
           if flight.airport_destination_country_code %}<img src="https://flagsapi.com/{{ flight.airport_destination_country_code }}/shiny/16.png" title='{{ flight.airport_destination_country_name }}'/>{% endif %}
@@ -295,7 +306,7 @@ cards:
           {% endfor %}
   - type: iframe
     url: >-
-      https://www.flightradar24.com/simple?lat=LATITUDE&lon=LONGITUDE&z=ZOOM&label1=reg&size=small
+      https://globe.adsb.fi/?enableLabels&trackLabels&zoom=12&hideSideBar&lat=LATITUDE&lon=LONGITUDE
     aspect_ratio: 100%
 ```
 
@@ -319,6 +330,7 @@ recorder:
 | altitude                            | Altitude (measurement: foot)                                                                                                                                                                                |
 | on_ground                           | Is the aircraft on ground (measurement: 0 - in the air; 1 - on ground)                                                                                                                                      |
 | distance                            | Distance between the aircraft and your point (measurement: kilometers)                                                                                                                                      |
+| closest_distance                    | Closest distance the aircraft reached to your point while tracking (measurement: kilometers)                                                                                                                |
 | ground_speed                        | Ground speed (measurement: knots)                                                                                                                                                                           |
 | squawk                              | Squawk code are what air traffic control (ATC) use to identify aircraft when they are flying **(for subscription only)**                                                                                    |
 | vertical_speed                      | Vertical speed                                                                                                                                                                                              |
@@ -380,6 +392,89 @@ Sensor `Most tracked` shows top 10 most tracked flights on FlightRadar24 with ne
 | airport_origin_city | Origin airport city name |
 | airport_destination_code_iata | Destination airport IATA code |
 | airport_destination_city | Destination airport city name |
+
+### <a id="lovelace-airport">Lovelace Airport Card</a>
+You can add departures/arrivals boards of the selected airport to your [Home Assistant dashboard](https://www.home-assistant.io/dashboards/)
+
+<p align="center"><img src="https://raw.githubusercontent.com/AlexandrErohin/home-assistant-flightradar24/master/docs/media/airport.jpg" width="48%"></p>
+
+1. Go to your [Home Assistant dashboard](https://www.home-assistant.io/dashboards/)
+2. In the top right corner, select the three-dot menu, then select Edit dashboard
+3. Click on `+ ADD CARD`, search for `Manual`, click on `Manual`. 
+4. Add following code to the input window and click `SAVE`
+
+```markdown
+type: vertical-stack
+title: Flightradar24
+cards:
+  - type: entities
+    entities:
+      - entity: sensor.flightradar24_airport_arrivals_canceled
+        name: Arrivals canceled
+      - entity: sensor.flightradar24_airport_arrivals_delayed
+        name: Arrivals delayed
+      - entity: sensor.flightradar24_airport_arrivals_on_time
+        name: Arrivals on time
+  - type: markdown
+    title: Arrivals
+    content: >
+      {% set flights =
+      state_attr('sensor.flightradar24_airport_arrivals','flights') |
+      default([], true) %}
+        | TIME | FROM | FLIGHT | REMARK |
+        | ---- | ---- | ------ | ------ | {% for f in flights %}
+        | {{ f.time_scheduled_arrival | timestamp_custom('%H:%M') if f.time_scheduled_departure else '--:--' }} | {{ f.airport_city |  default('---', true) }} | {{ f.flight_number |  default('---', true) }} | {{ f.status_text |  default('---', true) }} | {% endfor %}
+  - type: entities
+    entities:
+      - entity: sensor.flightradar24_airport_departures_canceled
+        name: Departures canceled
+      - entity: sensor.flightradar24_airport_departures_delayed
+        name: Departures delayed
+      - entity: sensor.flightradar24_airport_departures_on_time
+        name: Departures on time
+  - type: markdown
+    title: Departures
+    content: >
+      {% set flights = state_attr('sensor.flightradar24_airport_departures',
+      'flights') |  default([], true) %}
+        | TIME | TO | FLIGHT | REMARK |
+        | ---- | ---- | ------ | ------ | {% for f in flights %}
+        | {{ f.time_scheduled_departure | timestamp_custom('%H:%M') if f.time_scheduled_departure else '--:--' }} | {{ f.airport_city |  default('---', true) }} | {{ f.flight_number |  default('---', true) }} | {{ f.status_text |  default('---', true) }} |{% endfor %}
+```
+
+All available fields for flight you can check [here](#airport-flight)
+
+To start receiving data for an airport - Pass IATA or ICAO airport code to `text.flightradar24_airport_track`. To stop receiving airport data just pass an empty string
+
+### <a id="airport-flight">Airport Flight fields</a>
+Sensor `sensor.flightradar24_airport_arrivals` and `sensor.flightradar24_airport_departures` shows flights with next flight fields
+
+| Field | Description |
+|---|---|
+| status_text | Flight status test (example: Delayed 17:02) |
+| status | Flight status (example: delayed) |
+| flight_id | Flight id on FlightRadar24 |
+| flight_number | Flight Number |
+| callsign | Callsign of the flight |
+| aircraft_model | Aircraft model |
+| aircraft_code | Aircraft code |
+| aircraft_registration | Aircraft registration number |
+| airline | Airline full name |
+| airline_short | Airline short name |
+| airline_iata | Airline IATA code |
+| airline_icao | Airline ICAO code |
+| airport_name | Airport name |
+| airport_code_iata | Airport IATA code |
+| airport_code_icao | Airport ICAO code |
+| airport_country_name | Airport country name |
+| airport_country_code | Airport country code |
+| airport_city | Airport city |
+| time_scheduled_departure | Scheduled departure time |
+| time_scheduled_arrival | Scheduled arrival time |
+| time_real_departure | Real departure time |
+| time_real_arrival | Real arrival time |
+| time_estimated_departure | Estimated departure time |
+| time_estimated_arrival | Estimated arrival time |
 
 ## Thanks To
  - [FlightRadarAPI](https://github.com/JeanExtreme002/FlightRadarAPI) by [@JeanExtreme002](https://github.com/JeanExtreme002)
