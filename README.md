@@ -45,9 +45,13 @@ It allows you:
  - Airport departures - List of current departure flights for the selected airport
  - Airport arrivals on time - Amount of arrivals on time for the selected airport today
  - Airport arrivals delayed - Amount of delayed arrivals for the selected airport today
+ - Airport arrivals delay average - Average arrivals delay for the selected airport today
+ - Airport arrivals delay index - Disruption arrivals index for the selected airport today
  - Airport arrivals canceled - Amount of canceled arrivals for the selected airport today
  - Airport departures on time - Amount of departures on time for the selected airport today
  - Airport departures delayed - Amount of delayed departures for the selected airport today
+ - Airport departures delay average - Average departures delay for the selected airport today
+ - Airport departures delay index - Disruption departures index for the selected airport today
  - Airport departures canceled - Amount of canceled departures for the selected airport today
 
 ### <a id="device-tracker">Device Tracker</a>
