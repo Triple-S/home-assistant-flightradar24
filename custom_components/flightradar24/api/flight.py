@@ -227,7 +227,7 @@ class FlightProcessor:
                 exited = self._in_area.pop(key)
                 self._exited.append(exited)
                 self._event_manager.add_event(EVENT_EXIT, exited)
-                if exited.approaching:
+                if exited['approaching']:
                     self._passed.append(exited)
                     self._event_manager.add_event(EVENT_PASS, exited)
 
@@ -243,11 +243,9 @@ class FlightProcessor:
                     if is_new_flight:
                         self._entered.append(flight)
                         self._event_manager.add_event(EVENT_ENTRY, flight)
-
-        for flight in self._in_area.values():
-            if flight.passed:
-                self._passed.append(flight)
-                self._event_manager.add_event(EVENT_PASS, flight)
+                    if flight['passed']:
+                        self._passed.append(flight)
+                        self._event_manager.add_event(EVENT_PASS, flight)
 
     def update_flights_tracked(self) -> None:
         if not self._tracked:
