@@ -244,10 +244,10 @@ class FlightProcessor:
                         self._entered.append(flight)
                         self._event_manager.add_event(EVENT_ENTRY, flight)
 
-        for flight in self._in_area:
+        for flight in self._in_area.values():
             if flight.passed:
                 self._passed.append(flight)
-                self._event_manager.add_event(EVENT_PASS, exited)
+                self._event_manager.add_event(EVENT_PASS, flight)
 
     def update_flights_tracked(self) -> None:
         if not self._tracked:
